@@ -12,10 +12,11 @@ library(readxl)
 # Unzip IPEDS files
 # ------------------
 
-# HD2020
-# IC2020_AY
-# ADM2020
-# SFA2021
+#HD2021
+#IC2021_AY
+#ADM2021
+#SFA2122
+
 
 ipeds <- readLines('./ipeds_file_list.txt')
 ipeds <- ipeds[ipeds != '' & !grepl('^#', ipeds)]
@@ -33,10 +34,10 @@ for (i in ipeds) {
 # Read in data
 # -------------
 
-year <- 2020
+year <- 2021
 
 #HD
-hd2020 <- read_csv(
+hd <- read_csv(
   file.path(ipeds_data_dir, str_c('hd', year, '.csv')),
   col_types = cols_only(
     UNITID = 'c', INSTNM = 'c', ADDR = 'c', CITY = 'c', STABBR = 'c', ZIP = 'c', FIPS = 'c',
@@ -47,7 +48,7 @@ hd2020 <- read_csv(
   rename_with(str_to_lower)
 
 #IC
-ic2020_ay <- read_csv(
+ic_ay <- read_csv(
   file.path(ipeds_data_dir, str_c('ic', year, '_ay.csv')),
   col_types = cols_only(
     UNITID = 'c', CHG2AT2 = 'n', CHG2AF2 = 'n', CHG3AT2 = 'n', CHG3AF2 = 'n',
@@ -63,7 +64,7 @@ ic2020_ay <- read_csv(
   )
 
 #ADM
-adm2020 <- read_csv(
+adm <- read_csv(
   file.path(ipeds_data_dir, str_c('adm', year, '.csv')),
   col_types = cols_only(
     UNITID = 'c', ADMCON1 = 'c', ADMCON2 = 'c', APPLCN = 'n', APPLCNM = 'n', APPLCNW = 'n', ADMSSN = 'n', ADMSSNM = 'n', ADMSSNW = 'n',
@@ -72,7 +73,7 @@ adm2020 <- read_csv(
   rename_with(str_to_lower)
 
 #SFA
-sfa2021 <- read_csv(
+sfa <- read_csv(
   file.path(ipeds_data_dir, str_c('sfa', str_sub(year, 3, 4), str_sub(year+1, 3, 4), '.csv')),
   col_types = cols_only(
     UNITID = 'c', SCFA1N = 'n',
@@ -104,10 +105,10 @@ sfa2021 <- read_csv(
 # ------------------
 
 # Function to rename columns
-get_col_names <- function(filename, info = '') {
+get_col_names <- function(objectname, filename, info = '') {
   dict <- read_excel(file.path(ipeds_dict_dir, str_c(filename, '.xlsx')), sheet = 'varlist')
   
-  col_names <- names(get(filename))
+  col_names <- names(objectname)
   col_names <- plyr::mapvalues(col_names, dict$varname, dict$varTitle, warn_missing = F)
   col_names <- str_c(col_names, ' (', str_to_upper(filename), info, ')')
   
@@ -115,18 +116,18 @@ get_col_names <- function(filename, info = '') {
 }
 
 
-names(hd2020) <- get_col_names('hd2020')
-names(ic2020_ay) <- get_col_names('ic2020_ay')
-names(adm2020) <- get_col_names('adm2020')
-names(sfa2021) <- get_col_names('sfa2021')
+names(hd) <- get_col_names(hd, str_c('hd', year))
+names(ic_ay) <- get_col_names(ic_ay, str_c('ic', year, '_ay'))
+names(adm) <- get_col_names(adm, str_c('adm', year))
+names(sfa) <- get_col_names(sfa, str_c('sfa', str_sub(year, 3, 4), str_sub(year+1, 3, 4)))
 
 # --------------------
 # Merge and save data
 # --------------------
 
-ipeds <- hd2020 %>% 
-  left_join(ic2020_ay, by = 'UnitID') %>% 
-  left_join(adm2020, by = 'UnitID') %>% 
-  left_join(sfa2021, by = 'UnitID')
+ipeds <- hd %>% 
+  left_join(ic_ay, by = 'UnitID') %>% 
+  left_join(adm, by = 'UnitID') %>% 
+  left_join(sfa, by = 'UnitID')
 
 write_csv(ipeds, file = 'ipeds.csv')
