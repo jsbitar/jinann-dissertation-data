@@ -51,6 +51,16 @@ sc_source <- plyr::mapvalues(names(sc), lo_inc_vars$varname, lo_inc_vars$source,
 sc_names <- str_c(sc_desc, ' (', sc_source, ')')
 names(sc) <- c('UnitID', sc_names[-1])
 
+sc<-sc %>%
+  rename(
+  "10 Year Mean Earnings (0-30,000)" = "Mean earnings of students working and not enrolled 10 years after entry in the lowest income tercile $0-$30,000 (Treasury)",
+  "6 Year Mean Earnings (0-30,000)" = "Mean earnings of students working and not enrolled 6 years after entry in the lowest income tercile $0-$30,000 (Treasury)",
+  "6 Year Median Earnings (0-30,000)" = "Median earnings of students working and not enrolled 6 years after entry in the lowest income tercile $0-$30,000 (Treasury)",
+  "8 Year Median Earnings (0-30,000)" = "Median earnings of students working and not enrolled 8 years after entry in the lowest income tercile $0-$30,000 (Treasury)", 
+  "10 Year Median Earnings (0-30,000)" = "Median earnings of students working and not enrolled 10 years after entry in the lowest income tercile $0-$30,000 (Treasury)", 
+  "Median Student Loan Debt (0-30,000)" = "The median debt for students with family income between $0-$30,000 (NSLDS)",	 
+  "Number of Students in the Median Debt, Low-Income (0-30,000) Student Cohort" = "The number of students in the median debt low-income (less than or equal to $30,000 in nominal family income) students cohort (NSLDS)" 
+  )
 
 # ----------
 # Save data

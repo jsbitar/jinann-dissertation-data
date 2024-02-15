@@ -6,7 +6,7 @@ library(tidyverse)
 
 # College results data
 college_results <- read_delim('COLLEGE_RESULTS_VIEW_2021.CSV', delim = '|', na = c('', 'NA', '\\N'), col_types = cols('UNIQUE_IDENTIFICATION_NUMBER_OF_THE_INSTITUTION' = 'c'))%>%
-  select(-`Institution Name`)
+  select(-`Institution Name`, -`Institution Size Category`, -`Degree of Urbanization`, -`Sector of Institution`, -`City of Institution`)                                                                                   
 
 # DROPPING MULTIPLE VARIABLES
 # select(-`Institution Name`, -Address)
@@ -24,13 +24,7 @@ scorecard <- read_csv('scorecard.csv', col_types = cols('UnitID' = 'c'))
 
 results <- college_results %>% 
   left_join(ipeds, by = c('UNIQUE_IDENTIFICATION_NUMBER_OF_THE_INSTITUTION' = 'UnitID')) %>% 
-  left_join(scorecard, by = c('UNIQUE_IDENTIFICATION_NUMBER_OF_THE_INSTITUTION' = 'UnitID')) %>%
-  rename(
-    "Institution Name" = "instnm (HD2021)", 
-    "Address" = "addr (HD2021)",
-    "10 Year Median Earnings - 0-30k" = "Mean earnings of students working and not enrolled 10 years after entry in the lowest income tercile $0-$30,000 (Treasury)"
-  )
-
+  left_join(scorecard, by = c('UNIQUE_IDENTIFICATION_NUMBER_OF_THE_INSTITUTION' = 'UnitID'))
 
 write_csv(results, file = 'diss_results.csv')
 
